@@ -1,0 +1,52 @@
+@page "/children/create"
+@inject NewDbContext DB
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Child</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Child" OnValidSubmit="AddChild" FormName="create">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Child.Name" class="form-control" /> 
+                <ValidationMessage For="() => Child.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="annoying" class="form-label">Annoying:</label> 
+                <InputCheckbox id="annoying" @bind-Value="Child.Annoying" class="form-check-input" /> 
+                <ValidationMessage For="() => Child.Annoying" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="birthday" class="form-label">Birthday:</label> 
+                <InputDate id="birthday" @bind-Value="Child.Birthday" class="form-control" /> 
+                <ValidationMessage For="() => Child.Birthday" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/children">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Child Child { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddChild()
+    {
+        DB.Child.Add(Child);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/children");
+    }
+}

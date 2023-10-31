@@ -1,0 +1,23 @@
+@page "/children"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject NewDbContext DB
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="children/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Child">
+    <PropertyColumn Property="child => child.Name" />
+    <PropertyColumn Property="child => child.Annoying" />
+    <PropertyColumn Property="child => child.Birthday" />
+
+    <TemplateColumn Context="child">
+        <a href="@($"children/edit?id={child.ID}")">Edit</a> |
+        <a href="@($"children/details?id={child.ID}")">Details</a> |
+        <a href="@($"children/delete?id={child.ID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

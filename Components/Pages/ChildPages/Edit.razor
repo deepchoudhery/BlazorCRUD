@@ -1,0 +1,97 @@
+@page "/Children/edit"
+@inject NewDbContext DB
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Child</h4>
+<hr />
+@if (Child is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Child" OnValidSubmit="UpdateChild" FormName="edit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Child.ID" value="@Child.ID" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Child.Name" class="form-control" />
+                    <ValidationMessage For="() => Child.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="annoying" class="form-label">Annoying:</label>
+                    <InputCheckbox id="annoying" @bind-Value="Child.Annoying" class="form-control" />
+                    <ValidationMessage For="() => Child.Annoying" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="birthday" class="form-label">Birthday:</label>
+                    <InputDate id="birthday" @bind-Value="Child.Birthday" class="form-control" />
+                    <ValidationMessage For="() => Child.Birthday" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/children">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int ID { get; set; }
+
+    [SupplyParameterFromForm]
+    public Child? Child { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Child ??= await DB.Child.FirstOrDefaultAsync(m => m.ID == ID);
+
+        if (Child is null)
+        {
+            // Need a way to trigger a 404 here
+            // https://github.com/dotnet/aspnetcore/issues/45654
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateChild()
+    {
+        DB.Attach(Child!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ChildExists(Child!.ID))
+            {
+                // Need a way to trigger a 404 here
+                // https://github.com/dotnet/aspnetcore/issues/45654
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/children");
+    }
+
+    bool ChildExists(int id)
+    {
+        return DB.Child.Any(e => e.ID == id);
+    }
+}

@@ -1,0 +1,48 @@
+@page "/children/details"
+@inject NewDbContext DB
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Child</h4>
+    <hr />
+    @if (child is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@child.Name</dd>
+            <dt class="col-sm-2">Annoying</dt>
+            <dd class="col-sm-10">@child.Annoying</dd>
+            <dt class="col-sm-2">Birthday</dt>
+            <dd class="col-sm-10">@child.Birthday</dd>
+        </dl>
+        <div>
+            <a href="@($"/children/edit?id={child.ID}")">Edit</a> |
+            <a href="@($"/children")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Child? child;
+
+    [SupplyParameterFromQuery]
+    public int ID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        child = await DB.Child.FirstOrDefaultAsync(m => m.ID == ID);
+
+        if (child is null)
+        {
+            // Need a way to trigger a 404 here
+            // https://github.com/dotnet/aspnetcore/issues/45654
+        }
+    }
+}
